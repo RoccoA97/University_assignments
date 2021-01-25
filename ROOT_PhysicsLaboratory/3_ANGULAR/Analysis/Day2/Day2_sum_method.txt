@@ -1,0 +1,38 @@
+Day2 results:
+
+Legend: 
+Quantity_{index1,index2}
+index1 = energy of gamma (1=1173, 2=1333)
+index2 = index of detector (1=D1, 2=D2)
+d_index = distance from detector #index
+r = radius of detector surface
+S_index = geometric factor of detector #index
+
+d_1 [cm]: 12
+d_2 [cm]: 22
+r   [cm]: 3.75
+
+S_1: 0.0244141
+S_2: 0.00726369
+
+Counts N_11:	$	   6547168	\pm	      2559	$
+Counts N_12:	$	   2872168	\pm	      1695	$
+Counts N_21:	$	   5956975	\pm	      2441	$
+Counts N_22:	$	   2563329	\pm	      1601	$
+
+Sum peak counts P_1:	$	     39885	\pm	       200	$
+Sum peak counts P_2:	$	     12974	\pm	       114	$
+
+SUM PEAK METHOD
+*********************************************************************************
+Absolute Efficiency Abs_E_11:	$	0.006696	\pm	0.000034	$
+Absolute Efficiency Abs_E_12:	$	0.005061	\pm	0.000045	$
+Absolute Efficiency Abs_E_21:	$	0.006092	\pm	0.000031	$
+Absolute Efficiency Abs_E_22:	$	0.004517	\pm	0.000040	$
+
+Intrinsic Efficiency Int_E_11:	$	0.274248	\pm	0.001378	$
+Intrinsic Efficiency Int_E_12:	$	0.696784	\pm	0.006133	$
+Intrinsic Efficiency Int_E_21:	$	0.249526	\pm	0.001253	$
+Intrinsic Efficiency Int_E_22:	$	0.621860	\pm	0.005472	$
+*********************************************************************************
+

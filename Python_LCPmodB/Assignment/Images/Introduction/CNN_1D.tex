@@ -1,0 +1,222 @@
+%\documentclass[tikz,border=3mm]{standalone}
+
+%\usepackage{amsmath}
+
+%\usetikzlibrary{matrix,positioning,fit,backgrounds,intersections}
+
+
+
+%\begin{document}
+\def\layersep{1.0cm}
+%\begin{minipage}{0.6\columnwidth}
+    \begin{tikzpicture}[draw=black!50, mmat/.style={matrix of math nodes,column sep=-\pgflinewidth/2,
+       row sep=-\pgflinewidth/2,cells={nodes={draw,inner sep=5pt,ultra thin, scale=0.85}},draw=#1,thick,inner sep=0pt},
+       mmat/.default=black,
+       node distance=0.3em,
+       transform shape,scale=0.8]
+    
+    
+    \tikzstyle{every pin edge}=[<-,shorten <=1pt]
+    \tikzstyle{neuron}=[circle,fill=black!25,minimum size=10pt,inner sep=0pt]
+    \tikzstyle{input neuron}=[neuron, fill=red!50];
+    \tikzstyle{output neuron}=[neuron, fill=green!50];
+    \tikzstyle{hidden neuron}=[neuron, fill=blue!50];
+    \tikzstyle{annot} = [text width=4em, text centered]
+    
+    
+    
+     \matrix[mmat](mat1){
+            {\scriptsize 4} \\ 
+            {\scriptsize 2} \\ 
+            {\scriptsize 1} \\ 
+            {\scriptsize 4} \\ 
+            {\scriptsize 5} \\ 
+            {\scriptsize 0} \\ 
+            {\scriptsize 3} \\
+            {\scriptsize 1} \\
+            {\scriptsize 0} \\
+            {\scriptsize 5} \\
+            {\scriptsize 2} \\
+            {\scriptsize 0} \\
+            };
+     \def\myarray{{1},{0},{1}}       
+    \foreach \Y in {0,1,2}
+        {\foreach \X in {0}
+            {\pgfmathsetmacro{\myentry}{{\myarray}[\Y][\X]}
+            \path (mat1-\the\numexpr\Y+2\relax-1.south east)
+            node[anchor=south west,blue,scale=0.75,inner sep=2.2pt]{$\times\myentry$};
+    }}         
+    \node[fit=(mat1-2-1)(mat1-4-1),inner sep=0pt,draw,red,thick,name path=fit](f1){};      
+    \node[right=of mat1] (mul) {$*$};      
+    \matrix[mmat=blue,fill=blue!20,right=of mul,name path=mat2](mat2){    
+        1 \\ 
+        0 \\ 
+        1 \\ };
+    \node[right=of mat2] (eq) {$=$};       
+    \matrix[mmat,right=of eq](mat3){
+        5 \\
+        |[alias=4]|6 \\ 
+        6 \\ 
+        4 \\ 
+        8 \\ 
+        1 \\
+        3 \\
+        6 \\
+        2 \\
+        5 \\
+    };
+    \node[fit=(mat3-2-1)(mat3-2-1),inner sep=0pt,draw,green,thick,name path=not_to_consider](ntc){};
+    \node[fit=(mat3-9-1)(mat3-10-1),inner sep=0pt,draw,red,thick,name path=fit2](f2){};
+    \node[right=of mat3, label={\scriptsize Pool}] (pool) {$\longrightarrow$};
+    \matrix[mmat,right=of pool,name path=mmat3](mat4){    
+        6 \\ 
+        6 \\ 
+        8 \\
+        6 \\
+        |[alias=2]|5 \\
+    };
+    \node[fit=(mat4-5-1)(mat4-5-1),inner sep=0pt,draw,green,thick,name path=fit3](f3){};
+    \node[right=of mat4-1-1, label={\scriptsize DNN}] (DNN1) {$\longrightarrow$};
+    \node[right=of mat4-2-1] (DNN2) {$\longrightarrow$};
+    \node[right=of mat4-3-1] (DNN3) {$\longrightarrow$};
+    \node[right=of mat4-4-1] (DNN4) {$\longrightarrow$};
+    \node[right=of mat4-5-1] (DNN5) {$\longrightarrow$};
+    
+    
+    
+    
+    
+    \node[input neuron, draw=black!100, thick, right=of DNN1] (I-1){}; 
+    \node[input neuron, draw=black!100, thick, right=of DNN2] (I-2){}; 
+    \node[input neuron, draw=black!100, thick, right=of DNN3] (I-3){}; 
+    \node[input neuron, draw=black!100, thick, right=of DNN4] (I-4){}; 
+    \node[input neuron, draw=black!100, thick, right=of DNN5] (I-5){};
+    
+    \node[hidden neuron, draw=black!100, thick, right=\layersep of I-1] (H-3){};
+    \node[hidden neuron, draw=black!100, thick, right=\layersep of I-2] (H-4){};
+    \node[hidden neuron, draw=black!100, thick, right=\layersep of I-3] (H-5){};
+    \node[hidden neuron, draw=black!100, thick, right=\layersep of I-4] (H-6){};
+    \node[hidden neuron, draw=black!100, thick, right=\layersep of I-5] (H-7){};
+    \node[hidden neuron, draw=black!100, thick] (H-2) at ($ (H-4) !2.0! (H-3) $) {};%above=5pt of H-3] (H-2){};
+    \node[hidden neuron, draw=black!100, thick] (H-1) at ($ (H-3) !2.0! (H-2) $) {};%above=5pt of H-2] (H-1){};
+    \node[hidden neuron, draw=black!100, thick] (H-8) at ($ (H-6) !2.0! (H-7) $) {};%below=5pt of H-7] (H-8){};
+    \node[hidden neuron, draw=black!100, thick] (H-9) at ($ (H-7) !2.0! (H-8) $) {};%below=5pt of H-8] (H-9){};
+    
+    \node[output neuron, draw=black!100, thick, pin={[pin edge={->}]right:{\scriptsize Out{[}\#2{]}}}, right=\layersep of H-5] (O-2){};
+    \node[output neuron, draw=black!100, thick, pin={[pin edge={->}]right:{\scriptsize Out{[}\#1{]}}}, right=\layersep of H-6] (O-1){};
+    \node[output neuron, draw=black!100, thick, pin={[pin edge={->}]right:{\scriptsize Out{[}\#3{]}}}, right=\layersep of H-4] (O-3){};
+    
+    \foreach \source in {1,...,5}
+        \foreach \dest in {1,...,9}
+            \path (I-\source) edge (H-\dest);
+    
+    \foreach \source in {1,...,9}
+        \path (H-\source) edge (O-1);
+    \foreach \source in {1,...,9}
+        \path (H-\source) edge (O-2);
+    \foreach \source in {1,...,9}
+        \path (H-\source) edge (O-3);
+    
+    
+    
+    
+    
+    
+     \foreach \Anchor in {south west,north west,south east,north east}
+     {\path[name path=test] (f1.\Anchor) -- (mat2.\Anchor);
+     \draw[blue,densely dotted,name intersections={of=test and fit,total=\t}]
+     \ifnum\t>0 (intersection-\t) -- (mat2.\Anchor) \else
+      (f1.\Anchor) -- (mat2.\Anchor)\fi;
+      
+     \path[name path=test2]  (4.\Anchor) -- (mat2.\Anchor);  
+     \draw[green,densely dotted,name intersections={of=test2 and mat2,total=\tt}] 
+     \ifnum\tt>0 (intersection-1) -- (4.\Anchor) \else
+        (mat2.\Anchor) --  (4.\Anchor)\fi;
+    
+     \path[name path=test3] (f2.\Anchor) -- (mat4.\Anchor);
+     \draw[blue,densely dotted,name intersections={of=test3 and fit2,total=\t}]
+     \ifnum\t>0 (intersection-\t) -- (2.\Anchor) \else
+      (f2.\Anchor) -- (2.\Anchor)\fi;
+        }
+        
+     \path (mat3-10-1.south east) node[anchor=south west,blue,scale=0.75,inner sep=2.2pt]{max};
+     \path (mat1.south) node[below] {$\mathbf{I}$}
+      (mat2|-mat1.south) node[below] {$\mathbf{W}$}
+      (mat3|-mat1.south) node[below] {$\mathbf{I}*\mathbf{W}$}
+      (mat4|-mat1.south) node[below] {\textbf{Pooling}}
+      (H-5|-mat1.south) node[below] {\textbf{DNN}};
+      
+    \begin{scope}[on background layer]
+        \fill[red!20] (f1.north west) rectangle (f1.south east);
+    \end{scope}
+    \begin{scope}[on background layer]
+        \fill[red!20] (f2.north west) rectangle (f2.south east);
+    \end{scope}
+    \begin{scope}[on background layer]
+        \fill[green!20] (ntc.north west) rectangle (ntc.south east);
+    \end{scope}
+    \begin{scope}[on background layer]
+        \fill[green!20] (2.north west) rectangle (2.south east);
+    \end{scope}
+    %dobbiamo giusto sistemare un po' la forma e i plot (da mettere tutti in pdf per tenere la grafica vettoriale e sistemare le dimensioni perché forse sono un po' piccoli, ma se vuoi posso farlo io)
+    %nah vabbe ho già tutti i codici e so dove cercarli quindi faccio io in scialla (magari domani che oggi sto a pezzi)
+    % ahahahahaah sai dopo due mesi che non vedo mia morosa 
+    % diciamo che mi serve un po di riposo... ahhaa esatto
+    % ok buona cena... mi sa domani perchè tra un po dormiro (io ceno alle 19 ) ahahahah 
+    % scialla domani mattina mi metto e vado giu di grafici cosi li abbimamo tutti belli
+    % a domani... buona cena rocco
+    % * meritato riposo
+    % ok, a domani allora 
+    % Dai, io vado a cenare, ci sentiamo poi dopo o domani. Ma io sono terrone ahahhahah
+    %ma cosa hai combinato per stare così a pezzi ahahhahahahh dio can ahahahahah
+    %si infatti.. è venuto been anche come struttura secondo me
+    %sempre che latex non si svegli improvvisamente girato
+    %non sono molto in me però mi piace
+\end{tikzpicture}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{minipage}
+%\begin{minipage}{0.2\columnwidth}
+%
+%    \begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep, scale=0.5, transform shape]
+%        \tikzstyle{every pin edge}=[<-,shorten <=1pt]
+%        \tikzstyle{neuron}=[circle,fill=black!25,minimum size=10pt,inner sep=0pt]
+%        \tikzstyle{input neuron}=[neuron, fill=green!50];
+%        \tikzstyle{output neuron}=[neuron, fill=red!50];
+%        \tikzstyle{hidden neuron}=[neuron, fill=blue!50];
+%        \tikzstyle{annot} = [text width=4em, text centered]
+%    
+%        % Draw the input layer nodes
+%        \foreach \name / \y in {1,...,5}
+%        % This is the same as writing \foreach \name / \y in {1/1,2/2,3/3,4/4}
+%            %\node[input neuron, draw=black!100, thick, pin=left:{\scriptsize In{[}\#\y{]}}] (I-\name) at %(-\layersep,-1.5-1*\y) {};
+%            \node[input neuron, draw=black!100, thick] (I-\name) at (-\layersep,-1.5-1*\y) {};
+%    
+%        % Draw the hidden layer nodes
+%        \foreach \name / \y in {1,...,9}
+%            \path[yshift=0.5cm]
+%                node[hidden neuron,draw=black!100,thick] (H-\name) at (\layersep,-\y cm) {};
+%    
+%        % Draw the output layer node
+%        \node[output neuron,draw=black!100,thick,pin={[pin edge={->}]right:{\scriptsize Out{[}\#1{]}}}, right %of=H-4] (O1) {};
+%        \node[output neuron,draw=black!100,thick,pin={[pin edge={->}]right:{\scriptsize Out{[}\#2{]}}}, right %of=H-5] (O2) {};
+%        \node[output neuron,draw=black!100,thick,pin={[pin edge={->}]right:{\scriptsize Out{[}\#3{]}}}, right %of=H-6] (O3) {};
+%    
+%        % Connect every node in the input layer with every node in the
+%        % hidden layer.
+%        \foreach \source in {1,...,5}
+%            \foreach \dest in {1,...,9}
+%                \path (I-\source) edge (H-\dest);
+%    
+%        % Connect every node in the hidden layer with the output layer
+%        \foreach \source in {1,...,9}
+%            \path (H-\source) edge (O1);
+%        \foreach \source in {1,...,9}
+%            \path (H-\source) edge (O2);
+%        \foreach \source in {1,...,9}
+%            \path (H-\source) edge (O3);
+%    
+%        % Annotate the layers
+%        %\node[annot,above of=H-1, node distance=1.0cm] (hl) {Hidden layer};
+%        %\node[annot,left of=hl] {Input layer};
+%        %\node[annot,right of=hl] {Output layer};
+%    \end{tikzpicture}
+%\end{minipage}

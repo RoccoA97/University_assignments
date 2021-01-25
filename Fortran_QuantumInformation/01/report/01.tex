@@ -1,0 +1,177 @@
+\documentclass[a4paper]{article}
+
+\input{../../tex_preamble/packages.tex}
+\input{../../tex_preamble/settings.tex}
+\input{../../tex_preamble/new_commands.tex}
+
+\newcommand\Warning{%
+	\makebox[1.4em][c]{%
+		\makebox[0pt][c]{\raisebox{.1em}{\small!}}%
+		\makebox[0pt][c]{\color{red}\Large$\bigtriangleup$}
+	}
+}%
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+	basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+	breakatwhitespace=false,                  % sets if automatic breaks should only happen at whitespace
+	breaklines=false,                         % sets automatic line breaking
+	captionpos=b,                             % sets the caption-position to bottom
+	commentstyle=\color{mygreen},             % comment style
+	extendedchars=true,                       % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	keepspaces=true,                          % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+	keywordstyle=\color{blue},                % keyword style
+	language=[95]Fortran,                     % the language of the code
+	numbers=left,                             % where to put the line-numbers; possible values are (none, left, right)
+	numbersep=5pt,                            % how far the line-numbers are from the code
+	numberstyle=\tiny\color{mygray},          % the style that is used for the line-numbers
+	rulecolor=\color{black},                  % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	showspaces=false,                         % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+	showstringspaces=false,                   % underline spaces within strings only
+	showtabs=false,                           % show tabs within strings adding particular underscores
+	stepnumber=1,                             % the step between two line-numbers. If it's 1, each line will be numbered
+	stringstyle=\color{mymauve},              % string literal style
+	tabsize=4,                                % sets default tabsize to 2 spaces
+	title=\lstname                            % show the filename of files
+}
+
+
+
+\title{\textbf{\huge Quantum Information and Computing}\\Week 1 assignment}
+\author{Ardino Rocco\\Mat. 1231629\\\href{mailto:rocco.ardino@studenti.unipd.it}{rocco.ardino@studenti.unipd.it}}
+\date{\today}
+
+
+
+
+
+\begin{document}
+
+\maketitle
+\vspace{1cm}
+
+
+\section*{Exercise 1}
+The setup of the workspace was accomplished without any trouble. After, creating a working directory, inside this the following code for a test job is written:
+
+\begin{lstlisting}[label={lst:01_ex1_1},caption={Test job submitted.}]
+! 01_ex1.f90
+
+program setup
+
+	implicit none
+
+	print*, "Hello World!"
+
+end program
+\end{lstlisting}
+
+After accessing to spiro.fisica.unipd.it through \texttt{ssh} protocol, the test job is compiled through gfortran compiler and correctly submitted and executed.
+
+
+
+
+
+\section*{Exercise 2}
+The first sum of the numbers \( 1 \) and \( 2000000 \) is performed using integers of 2 bytes and then of 4 bytes. In the first case, there is evidence of overflow since the result is not correct (\( -31615 \)). In the second case, the operation returns the correct result.
+
+The second sum of the numbers \( \pi \cdot 10^{32} \) and \( \sqrt{2} \cdot 10^{21} \) is performed using floating points of 4 bytes and then of 8 bytes. The first operation returns the correct result up to the seventh significant digit in comparison to the second operation, which is considered much more accurate for the greater number of bytes involved.
+
+
+
+
+
+\section*{Exercise 3}
+Several implementations of matrix matrix multiplication are possible, depending on the order of the loops needed for the purpose. The two implementations for this report are given in Listings \ref{lst:01_ex3_1} and \ref{lst:01_ex3_2}.
+
+\begin{lstlisting}[label={lst:01_ex3_1},caption={First implementation of matrix matrix multiplication.}]
+! matrix matrix multiplication by column
+function matmul_col(mat1, mat2) result(mat3)
+	integer*2 :: ii, jj, kk
+	integer*2 :: N, M, L
+	real*4, dimension(:,:) :: mat1, mat2
+	real*4, dimension(size(mat1, 1),size(mat2, 2)) :: mat3
+
+	N = size(mat1, 1)
+	M = size(mat1, 2)
+	L = size(mat2, 2)
+
+	do jj=1,M
+		do kk=1,L
+			do ii=1,N
+				mat3(ii,jj) = mat3(ii,jj) + mat1(ii,kk)*mat2(kk,jj)
+			end do
+		end do
+	end do
+end function
+\end{lstlisting}
+
+\begin{lstlisting}[label={lst:01_ex3_2},caption={Second implementation of matrix matrix multiplication.}]
+! matrix matrix multiplication by row
+function matmul_row(mat1, mat2) result(mat3)
+	integer*2 :: ii, jj, kk
+	integer*2 :: N, M, L
+	real*4, dimension(:,:) :: mat1, mat2
+	real*4, dimension(size(mat1, 1),size(mat2, 2)) :: mat3
+
+	N = size(mat1, 1)
+	M = size(mat1, 2)
+	L = size(mat2, 2)
+
+	do ii=1,N
+		do kk=1,L
+			do jj=1,M
+				mat3(ii,jj) = mat3(ii,jj) + mat1(ii,kk)*mat2(kk,jj)
+			end do
+		end do
+	end do
+end function
+\end{lstlisting}
+
+Their performances are monitored for \( n \times n \) matrices through the function \texttt{CPU\_TIME} and for different values of \( n \). The results are showed in Figure \ref{fig:01_ex3_1}. It is possible to see how the first implementation is slightly faster than the second one and how the two user implementations are much slower than the intrinsic one. The first fact is due to the way fortran stores variables in memory when dealing with arrays. In fact, this is done by columns, so the first implementation is faster since the inner loop is over consecutive elements in memory. The second fact is due to a different implementation highly optimized using state of the art algorithms.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/01_ex3_performance.pdf}
+	\caption{\label{fig:01_ex3_1} Performances of the two implementations and of the intrinsic function depending on the matrix size \( n \).}
+\end{figure}
+
+Another test on the execution speed is done by applying different optimization flags, listed in Table \ref{tab:01_ex3_1}. The same analysis done before is performed for every implementation and for every optimization flag. Again, the results are plotted in order to compare how the different flags affect the execution time of the matrix matrix multiplication. The plots are showed in Figure \ref{fig:01_ex3_2}.
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{ccccc}
+		\toprule
+		Flag	&	Exec. time	&	Code size	&	Mem. usage	&	Compile time	\\
+		\midrule
+		\texttt{-O0}	&	\( + \) 	&	\( + \)	&	\( - \)	&	\( - \)  	\\
+		\texttt{-O1}	&	\( - \) 	&	\( - \)	&	\( + \)	&	\( + \)  	\\
+		\texttt{-O2}	&	\( -- \)	&	       	&	\( + \)	&	\( ++ \) 	\\
+		\texttt{-O3}	&	\( --- \)	&	       	&	\( + \)	&	\( +++ \)	\\
+		\texttt{-Ofast}	&	\( --- \)	&	       	&	\( + \)	&	\( +++ \)	\\
+		\bottomrule
+	\end{tabular}
+	\caption{Optimization flags effects.}
+	\label{tab:01_ex3_1}
+\end{table}
+
+\begin{figure}[H]
+	\centering
+	\begin{minipage}[t]{0.32\linewidth}
+		\centering
+		\includegraphics[width=1\textwidth]{images/01_ex3_matmul_col_O.pdf}
+	\end{minipage}
+	\begin{minipage}[t]{0.32\linewidth}
+		\centering
+		\includegraphics[width=1\textwidth]{images/01_ex3_matmul_row_O.pdf}
+	\end{minipage}
+	\begin{minipage}[t]{0.32\linewidth}
+		\centering
+		\includegraphics[width=1\textwidth]{images/01_ex3_matmul_O.pdf}
+	\end{minipage}
+	\caption{\label{fig:01_ex3_2} Left: execution time for the first implementation for several optimization flags. Center: execution time for the second implementation for several optimization flags. Right: execution time for the intrinsic function for several optimization flags.}
+\end{figure}
+
+\end{document}

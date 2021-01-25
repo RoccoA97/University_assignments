@@ -1,0 +1,242 @@
+\documentclass[pra, onecolumn, notitlepage, floats, 11pt]{revtex4-1}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{latexsym,amsmath}
+\usepackage{comment}
+\usepackage{tabularx}
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage{tikz, fp}
+\usepackage{wrapfig}
+\usepackage{amsfonts}
+\usepackage[pdftex,colorlinks=true, pdfstartview=FitV, linkcolor= linkcolor, citecolor= linkcolor, urlcolor= linkcolor, hyperindex=true,hyperfigures=true]{hyperref} %hyperlink%
+\usepackage{fancyhdr}
+\usepackage{inconsolata}
+\usepackage{listings}
+\usepackage{physics}
+\usepackage{datetime}
+
+\usepackage{titlesec}
+
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{cobalt}{rgb}{0.0, 0.28, 0.67}
+\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}
+\definecolor{dartmouthgreen}{rgb}{0.05, 0.5, 0.06}
+\definecolor{lava}{rgb}{0.81, 0.06, 0.13}
+% move section headings to left
+% \sffamily
+% \scshape
+%\titleformat{\section}{\raggedright\sffamily\bfseries\fontsize{13pt}{13}\selectfont}{\arabic{section}}{1em}{\MakeUppercase}
+\titleformat{\section}{\raggedright\bfseries\scshape\fontsize{13pt}{13}\selectfont}{\color{cobalt}\arabic{section}}{1em}{\color{cobalt}}
+\titleformat{\subsection}{\raggedright\bfseries\scshape\fontsize{12pt}{12}\selectfont}{\arabic{section}.\arabic{subsection}}{1em}{}
+
+\linespread{0.956}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\definecolor{linkcolor}{rgb}{0,0,0.65}
+\definecolor{shadecolor}{rgb}{0.95, 0.95, 0.95}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+    backgroundcolor=\color{shadecolor},       % background color
+    basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+    breakatwhitespace=false,                  % sets if automatic breaks should only happen at whitespace
+    breaklines=false,                         % sets automatic line breaking
+    captionpos=b,                             % sets the caption-position to bottom
+    commentstyle=\color{mygreen},             % comment style
+    extendedchars=true,                       % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+    keepspaces=true,                          % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\bfseries\color{blue},       % keyword style
+    language=[95]Fortran,                     % the language of the code
+    numbers=left,                             % where to put the line-numbers; possible values are (none, left, right)
+    numbersep=5pt,                            % how far the line-numbers are from the code
+    numberstyle=\tiny\color{mygray},          % the style that is used for the line-numbers
+    rulecolor=\color{black},                  % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    showspaces=false,                         % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,                   % underline spaces within strings only
+    showtabs=false,                           % show tabs within strings adding particular underscores
+    stepnumber=1,                             % the step between two line-numbers. If it's 1, each line will be numbered
+    stringstyle=\color{mymauve},              % string literal style
+    tabsize=4,                                % sets default tabsize to 2 spaces
+    title=\lstname                            % show the filename of files
+}
+
+
+\pagestyle{fancy}
+\fancyhf{}
+%\fancyhead[L]{Rocco Ardino (Mat. 1231629)}
+%\fancyhead[R]{\thepage}
+%\fancyfoot[L]{Week 2 report}
+%\fancyfoot[R]{\today}
+\fancyhead[L]{Rocco Ardino (Mat. 1231629)}
+\fancyhead[R]{\bf\thepage}
+\fancyfoot[L]{\textsc{report}: Week 2}
+\fancyfoot[R]{\today}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0.1pt}
+
+\newcommand{\codebold}[1]{\texttt{\bfseries {\color{cobalt}#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\codefunctionbold}[2]{\texttt{\bfseries {\color{cobalt}#1}({\color{lava}#2})}}
+\newcommand{\codefunction}[2]{\texttt{#1(#2})}
+
+
+
+
+
+
+
+
+
+
+\begin{document}
+
+\title{Quantum Information and Computing 2020/21\\Week 2 report}
+
+\author{Rocco Ardino}
+
+\date{\today}
+
+
+
+
+
+\begin{abstract}
+We discuss the creation of a new module in Fortran90, containing a double precision complex matrix derived type, and including useful properties such as the matrix size, trace and determinant. We implement the code needed for this purpose along with debug checks, printing functions and ``constructor'' functions to initialize variables of the new type. Lastly, we check the correct behaviour in a test program to validate the correctness of the module.
+\end{abstract}
+
+\maketitle
+
+
+\section{Theory}
+Given a complex square matrix \( A = [a_{ij}] \), where \( i=1,\dots,n \) and \( j=1,\dots,n \), its trace is computed through:
+\begin{equation}
+    \tr[A]
+    =
+    \sum_{i=1}^{n} a_{ii}
+    \quad.
+    \label{eq:02_T_TR}
+\end{equation}
+In general, given a complex matrix \( A = [a_{ij}] \), where \( i=1,\dots,n \) and \( j=1,\dots,m \), its adjoint is computed through:
+\begin{equation}
+    \operatorname{adj}[A]
+    :=
+    A^{\dag}
+    =
+    [a^*_{ji}]
+    \quad.
+    \label{eq:02_T_ADJ}
+\end{equation}
+Note that when computing the adjoint of a square matrix, the trace of the new matrix is the complex conjugate of the original matrix.
+
+Lastly, given \( A \) a \( n \times n \) square matrix and \( S_n \) the set of all the permutations \( \sigma \) of the set \( \qty{1,2,\dots,n} \), the determinant of \( A \) can be obtained from Leibniz formula:
+\begin{equation}
+    \det(A)
+    =
+    \sum_{\sigma \in S_n}^{} \qty(\operatorname{sgn}(\sigma) \prod_{i=1}^{n} a_{i,\sigma_i})
+    \quad.
+    \label{eq:02_T_DET}
+\end{equation}
+However, this algorithm is highly inefficient for large \( n \) since its complexity is \( \mathcal{O}(n!) \). A good alternative is to exploit the ``LU'' decomposition of a square matrix \( A = LU \) in order to make feasible this computation for large matrices. Therefore, the new determinant computation algorithm reads:
+\begin{equation}
+    \det(A)
+    =
+    \det(L) \det(U)
+    =
+    \qty(\prod_{i=1}^{n} l_{ii}) \qty(\prod_{i=1}^{n} u_{ii})
+    \quad.
+    \label{eq:02_T_DET_LU}
+\end{equation}
+
+
+
+
+
+\section{Code Development}
+The first operation is the definition of the new module, called \codebold{zmatmod}. Inside it, there are:
+\begin{itemize}
+    \item the definition of the new type, called \codebold{zmat}. It contains:
+    \begin{itemize}
+        \item[\( \triangleright \)] an array of two 2-byte integers, namely \( n \) and \( m \), representing the matrix dimensions;
+        \item[\( \triangleright \)] an array of dimensions \( (n,m) \) of double precision complex numbers, storing the matrix elements;
+        \item[\( \triangleright \)] a double precision complex, storing the trace;
+        \item[\( \triangleright \)] a double precision complex, storing the determinant;
+    \end{itemize}
+
+    \item the definition of several functions, in particular:
+    \begin{itemize}
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_init\_zero}{dim}: it initializes a \code{zmat} variable with matrix dimensions given by the input array \code{dim}. Every entry of the matrix is set to zero;
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_init\_rand}{dim}: it behaves like \code{zmat\_init\_zero}, but the matrix entries are set to uniform random numbers inside \( (0,1) \);
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_tr}{a}: it computes and returns the trace of the matrix contained in the \code{zmat} input argument, if the dimensions are the same. Otherwise, it returns an error message;
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_adj}{a}: it computes and returns the adjoint of the \code{zmat} input argument. Therefore, it returns a \code{zmat} object containing the inverted dimensions of the input, the adjoint of the matrix, the conjugate of the trace and of the determinant (if the dimensions are the same);
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_det}{a}: it computes and returns the determinant of the matrix contained in the \code{zmat} input argument, if the dimensions are the same. Otherwise, it returns an error message. Note that the calculation is not yet implemented, so the result is set to 1 for convention;
+    \end{itemize}
+
+    \item the definition of several subroutines, in particular:
+    \begin{itemize}
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_print\_std}{a,formatted}: it prints on the standard output, namely on the terminal, the complex matrix of the \code{zmat} input argument \code{a} in a human readable form. If the argument flag \code{formatted} is enabled, the numbers are truncated and formatted in order to have a cleaner output;
+        \item[\( \triangleright \)] \codefunctionbold{zmat\_print\_file}{a,fname,unit,formatted}: it does the work of \code{zmat\_print\_std}, but on a file \code{fname} associated to the unit argument \code{unit};
+    \end{itemize}
+
+    \item some operators that are an interface to a certain function, in particular:
+    \begin{itemize}
+        \item[\( \triangleright \)] \codebold{.tr.}: it is an interface to \code{zmat\_tr}, so it computes and returns the trace;
+        \item[\( \triangleright \)] \codebold{.adj.}: it is an interface to \code{zmat\_adj}, so it computes and returns the adjoint;
+        \item[\( \triangleright \)] \codebold{.det.}: it is an interface to \code{zmat\_det}, so it computes and returns the determinant.
+    \end{itemize}
+\end{itemize}
+
+In order to test the new module, the latter is inserted inside a test program where simple operations are done using the new type. Its compilation does not require particular compilation flags. This test program is showed in Listing \ref{lst:02_C_TEST}.
+
+\begin{lstlisting}[frame=single,label={lst:02_C_TEST},caption={Test program. The module definition is omitted for simplicity.}]
+program test
+    use zmatmod
+    implicit none
+
+    integer*2, dimension(2) :: dim
+    type(zmat) :: a                                 ! declare zmat var of name 'a'
+    type(zmat) :: a_adj                             ! declare zmat var for adj(a)
+
+    dim(1) = 5                                      ! fix a%elem dimensions to (5,5)
+    dim(2) = 5
+
+    a = zmat_init_rand(dim)                         ! initialize randomly 'a'
+    a_adj = .adj.a                                  ! adjoint of 'a'
+
+    print *, "zmat variable 'a':"
+    call zmat_print_std(a, .TRUE.)                  ! print zmat type on terminal
+    print *, NEW_LINE('a'), "Adjoint of 'a':"
+    call zmat_print_std(a_adj, .TRUE.)              ! print zmat adjoint on terminal
+
+    print *, NEW_LINE('a'), "Writing 'a' variable on file..."
+    call zmat_print_file(a, "zmat.txt", 20, .TRUE.) ! write zmat type on file
+
+    print *, NEW_LINE('a'), "Check if new operators work fine..."
+    print *, "Trace of a:           ", .tr.a
+    print *, "Trace of adj(a):      ", .tr.a_adj
+    print *, "Determinant of a:     ", .det.a       ! Not yet implemented
+    print *, "Determinant of adj(a):", .det.a_adj   ! Not yet implemented
+end program test
+\end{lstlisting}
+
+
+
+
+
+\section{Results}
+The execution of the test does not show particular problems. The double precision complex matrix is printed in a human readable form on a text file in a limited precision format. This depends on the numerical format given in the write command inside the \code{zmat\_print\_file} subroutine when the \code{formatted} flag is enabled. Concerning the trace and adjoint operations, their correctness is tested by printing on terminal their results for a \( 5 \times 5 \) matrix. A manual calculation confirms that they work fine.
+
+
+
+
+
+\section{Self-evaluation}
+The implementation of the code has led to successful results. The calculation of the determinant has not been implemented, so it can be the first future development of the code. For this purpose, an implementation of ``LU'' decomposition, mentioned in the theory Section, would be useful. Last but not least, I have done new progresses in learning Fortran programming language and writing new code in a cleaner and more efficient way is becoming easier.
+
+\end{document}

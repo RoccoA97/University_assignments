@@ -1,0 +1,333 @@
+\documentclass[pra, onecolumn, notitlepage, floats, 11pt]{revtex4-1}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{latexsym,amsmath}
+\usepackage{comment}
+\usepackage{tabularx}
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage{tikz, fp}
+\usepackage{wrapfig}
+\usepackage{amsfonts}
+\usepackage[pdftex,colorlinks=true, pdfstartview=FitV, linkcolor= linkcolor, citecolor= linkcolor, urlcolor= linkcolor, hyperindex=true,hyperfigures=true]{hyperref} %hyperlink%
+\usepackage{fancyhdr}
+\usepackage{inconsolata}
+\usepackage{listings}
+\usepackage{physics}
+\usepackage{datetime}
+
+\usepackage{titlesec}
+
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}  %#5D8AA8
+\definecolor{cobalt}{rgb}{0.0, 0.28, 0.67}         %#0047AB
+\definecolor{coolblack}{rgb}{0.0, 0.18, 0.39}      %#002E63
+\definecolor{dartmouthgreen}{rgb}{0.05, 0.5, 0.06} %#00693E
+\definecolor{lava}{rgb}{0.81, 0.06, 0.13}          %#CF1020
+% move section headings to left
+% \sffamily
+% \scshape
+%\titleformat{\section}{\raggedright\sffamily\bfseries\fontsize{13pt}{13}\selectfont}{\arabic{section}}{1em}{\MakeUppercase}
+\titleformat{\section}{\raggedright\bfseries\scshape\fontsize{13pt}{13}\selectfont}{\color{cobalt}\arabic{section}}{1em}{\color{cobalt}}
+\titleformat{\subsection}{\raggedright\bfseries\scshape\fontsize{12pt}{12}\selectfont}{{\color{cobalt}\arabic{section}.\arabic{subsection}}}{1em}{\color{cobalt}}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{subsubsection}}
+\makeatletter
+\renewcommand{\p@subsection}{\thesection.}
+\renewcommand{\p@subsubsection}{\thesection.\thesubsection.}
+\makeatother
+
+
+\linespread{0.956}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\definecolor{linkcolor}{rgb}{0,0,0.65}
+\definecolor{shadecolor}{rgb}{0.95, 0.95, 0.95}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+    backgroundcolor=\color{shadecolor},       % background color
+    basicstyle=\ttfamily\footnotesize,        % the size of the fonts that are used for the code
+    breakatwhitespace=false,                  % sets if automatic breaks should only happen at whitespace
+    breaklines=false,                         % sets automatic line breaking
+    captionpos=b,                             % sets the caption-position to bottom
+    commentstyle=\color{mygreen},             % comment style
+    extendedchars=true,                       % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+    keepspaces=true,                          % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\bfseries\color{blue},       % keyword style
+    language=[95]Fortran,                     % the language of the code
+    numbers=left,                             % where to put the line-numbers; possible values are (none, left, right)
+    numbersep=5pt,                            % how far the line-numbers are from the code
+    numberstyle=\tiny\color{mygray},          % the style that is used for the line-numbers
+    rulecolor=\color{black},                  % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    showspaces=false,                         % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,                   % underline spaces within strings only
+    showtabs=false,                           % show tabs within strings adding particular underscores
+    stepnumber=1,                             % the step between two line-numbers. If it's 1, each line will be numbered
+    stringstyle=\color{mymauve},              % string literal style
+    tabsize=4,                                % sets default tabsize to 2 spaces
+    title=\lstname                            % show the filename of files
+}
+
+
+\pagestyle{fancy}
+\fancyhf{}
+%\fancyhead[L]{Rocco Ardino (Mat. 1231629)}
+%\fancyhead[R]{\thepage}
+%\fancyfoot[L]{Week 2 report}
+%\fancyfoot[R]{\today}
+\fancyhead[L]{Rocco Ardino (Mat. 1231629)}
+\fancyhead[R]{\bf\thepage}
+\fancyfoot[L]{\textsc{report}: Week 3}
+\fancyfoot[R]{\today}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0.1pt}
+
+\newcommand{\codebold}[2][cobalt]{\texttt{\bfseries {\color{#1}#2}}}
+\newcommand{\code}[2][black]{\color{#1}\texttt{#2}}
+\newcommand{\codefunctionbold}[2]{\texttt{\bfseries {\color{cobalt}#1}({\color{lava}#2})}}
+\newcommand{\codefunction}[2]{\texttt{#1(#2})}
+
+
+
+
+
+
+
+
+
+
+\begin{document}
+
+\title{Quantum Information and Computing 2020/21\\Week 3 report}
+
+\author{Rocco Ardino}
+
+\date{\today}
+
+
+
+
+
+\begin{abstract}
+In order to write user-friendly code, it is important to make it clear as much as possible and to implement debugging functionalities. A possibility is offered by the common practice of Fortran checkpoint subroutines. In this report, we implement a new module containing a simplified version of this subroutine and we apply the new functionality to a program where matrix matrix multiplications are performed. Moreover, pre- and post- conditions are attached to the operations to make debugging phase cleaner and more feasible. Lastly, we add a concise and complete documentation to the code written for the report.
+\end{abstract}
+
+\maketitle
+
+
+\section{Theory}
+Let us consider two matrices \( A \in \mathbb{R}^{n \times m} \) and \( B \in \mathbb{R}^{p \times q} \), of dimensions respectively \( n \times m \) and \( p \times q \). If \( m = p \), it is possible to compute the matrix product \( AB \) and the result is a matrix \( C \in \mathbb{R}^{n \times q} \) of dimensions \( n \times q \), with matrix elements:
+\begin{equation}
+    c_{ij}
+    =
+    \sum_{k=1}^{p} a_{ik} b_{kj},
+    \qquad
+    ^{i=1,\dots,n}_{j=1,\dots,q}
+    \quad .
+    \label{eq:03_T_MATMUL}
+\end{equation}
+This algorithm is implemented in a very simple way through:
+\begin{itemize}
+    \item a loop over \( k \) for the calculation of a single matrix element (complexity: \( \mathcal{O}(m=p) \));
+    \item two loops over \( i \) and \( j \) for the calculation of all the entries of the product matrix (complexity: \( \mathcal{O}(nq) \))
+\end{itemize}
+Therefore, the overall complexity of the operation is \( \mathcal{O}(nmq) \), being \( \mathcal{O}(n^3) \) for the special case of two square matrices multiplication.
+
+From a mathematical point of view, the order of the three loops is irrelevant for the result. However, it affects the performances depending on the way a language stores variables in memory. This study was done in the report for the week 1, so it is not treated here since we will focus on debug tools.
+
+
+
+
+
+\section{Code Development}
+The new module \codebold{err\_handling\_mod} is implemented in order to deal with the debugging of Fortran code. Its core component is the subroutine \codebold{check}, whose features are explained in the following Subsection \ref{ssec:C_SS_1}. The implementation of other useful functions inside the module is described in Subsections \ref{ssec:C_SS_2} and \ref{ssec:C_SS_3}.
+
+
+
+
+\subsection{Check subroutine}
+\label{ssec:C_SS_1}
+This subroutine has several input arguments to deal with multiple cases:
+\begin{itemize}
+    \item \codebold[black]{debug}: logical that enables/disables debug output messages;
+    \item \codebold[black]{condition}: logical representing the condition to verify in order to print debugging messages and/or stop the execution at checkpoint;
+    \item \codebold[black]{msg\_type}: string representing the type of debugging message (for example, ``Error'' or ``Warning'');
+    \item \codebold[black]{msg}: string containing the debugging message;
+    \item \codebold[black]{trg\_stop} (optional): logical that stops the execution, if enabled, when the condition argument is true;
+    \item \codebold[black]{var} (optional): generic variable to print if given.
+\end{itemize}
+
+The first operation is a check on the condition: if it is met, the subroutine enters in a block where another check on the debug flag is met. If also this check is satisfied, the subroutine enters in a block containing the logic for printing debug statements. The implementation of this part of code is sketched in Listings \ref{lst:03_C_SS_1_1} and \ref{lst:03_C_SS_1_2}, respectively for message and variable printing. For Listing \ref{lst:03_C_SS_1_1}, note how the debugging message is attached to a string flag indicating the type of the message with a different color. For Listing \ref{lst:03_C_SS_1_2}, observe how the code is capable of discerning the type of the variable to print through a case selection block.
+
+\begin{lstlisting}[frame=single,label={lst:03_C_SS_1_1},caption={Implementation of message printing along with message type. Color and style from bash scripting are employed.}]
+! choose among message type (error/warning) if given
+if (msg_type == "Error") then
+    print *, "["//achar(27)//"[1;31m"//msg_type//achar(27)//"[0m]: "//msg
+else if (msg_type == "Warning") then
+    print *, "["//achar(27)//"[1;95m"//msg_type//achar(27)//"[0m]: "//msg
+else if (msg_type == "Debug") then
+    continue ! do nothing
+else
+    print *, "["//achar(27)//"[1;32m"//msg_type//achar(27)//"[0m]: "//msg
+end if
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single,label={lst:03_C_SS_1_2},caption={Implementation of variable printing through case select block.}]
+! print variable if var is given
+if (present(var)) then
+    ! switch over several cases for the type of the variable
+    select type(var)
+        type is (logical)
+            print *, var, "logical variable"
+        type is (integer(2))
+            print *, var, "integer(2) variable"
+        type is (integer(4))
+            print *, var, "integer(4) variable"
+        type is (real(4))
+            print *, var, "real(4) variable"
+        type is (real(8))
+            print *, var, "real(8) variable"
+        type is (complex(4))
+            print *, var, "complex(8) variable"
+        type is (complex(8))
+            print *, var, "complex(16) variable"
+        type is (character(*))
+            print *, var, "character(*) variable"
+    end select
+end if
+\end{lstlisting}
+
+When the subroutine exits the debug block, another condition block is met, namely the one involving the optional argument \code{trg\_stop}. If enabled, it stops the execution of the program at checkpoint when the condition is met. Note that the stopping flag has a true default value and this is possible through the declaration of a dummy variable \code{trg\_stop\_}. This trick and the condition block are showed in Listing \ref{lst:03_C_SS_1_3}.
+
+\begin{lstlisting}[frame=single,label={lst:03_C_SS_1_3},caption={Implementation of the stopping block along with default value.}]
+! dummy arguments
+logical :: trg_stop_
+
+if (.NOT.present(trg_stop)) then
+    trg_stop_ = .TRUE.
+else
+    trg_stop_ = trg_stop
+end if
+
+! check if error/warning/... condition is satisfied
+if (condition) then
+
+    if (debug) then
+        ...
+    end if
+
+    ! stop execution if flag is enabled
+    if (trg_stop_) stop
+
+! end if block for condition
+end if
+\end{lstlisting}
+
+Now, let us take into account a simple example of matrix matrix multiplication in order to explain a use case of checkpoint. Before applying the multiplication algorithm, one would check if the two matrices have the correct dimensions. Therefore, one could exploit a sketch of code similar to the one in Listing \ref{lst:03_C_SS_1_4} as pre-condition.
+
+\begin{lstlisting}[frame=single,label={lst:03_C_SS_1_4},caption={Example of application of check subroutine to matrix matrix multiplication.}]
+N = size(mat1, 1)
+M = size(mat1, 2)
+P = size(mat2, 1)
+Q = size(mat2, 2)
+
+! pre-condition: check if mat2 can multiply mat1 (mat1.cols=?=mat2.rows)
+call check(debug     = .TRUE., &
+           condition = M.NE.P, &
+           msg_type  = "Error", &
+           msg       = "Cannot do mat1*mat2: size(mat1,2) =/= size(mat2,1)", &
+           trg_stop  = .TRUE.)
+\end{lstlisting}
+
+
+
+\subsection{Dimensions check function}
+\label{ssec:C_SS_2}
+The function \codefunctionbold{dim\_check}{mat1,mat2} is implemented in order to check if the dimensions of the input matrices \code{mat1} and \code{mat2} are the same. This information is stored in the result logical \code{AreDimEq}, as can be seen in the sketch of implementation in Listing \ref{lst:03_C_SS_2_1}.
+\begin{lstlisting}[frame=single,label={lst:03_C_SS_2_1},caption={Sketch of the implementation of \codefunctionbold{dim\_check}{mat1,mat2} function for dimension check.}]
+! mat1 and mat2 dimensions
+N1 = size(mat1, 1)
+M1 = size(mat1, 2)
+N2 = size(mat2, 1)
+M2 = size(mat2, 2)
+
+if ((N1.EQ.N2).AND.(M1.EQ.M2)) then
+    AreDimEq = .TRUE.
+else
+    AreDimEq = .FALSE.
+end if
+\end{lstlisting}
+
+
+
+\subsection{Matrix equality check function}
+\label{ssec:C_SS_3}
+The function \codefunctionbold{eq\_check}{mat1,mat2,thld} is implemented in order to check if the input matrices \code{mat1} and \code{mat2} are the same at a precision level encoded in the optional threshold argument \code{thld}. Given \( A \) and \( B \) the two input matrices, the equality rule applied is the following:
+\begin{equation}
+    \abs{a_{ij} - b_{ij}}
+    <
+    \text{thld} \cdot \frac{1}{2} \abs{a_{ij} + b_{ij}},
+    \qquad
+    \forall i,j \quad .
+\end{equation}
+Concerning the threshold argument, its default value is set to \( 10^{-6} \) with the same trick used for \code{trg\_stop} in the checkpoint subroutine. The implementation of this function is sketched in Listing \ref{lst:03_C_SS_3_1}, where we can see that the equality information is returned in the logical \code{AreMatEq}.
+
+
+\begin{lstlisting}[frame=single,label={lst:03_C_SS_3_1},caption={Sketch of implementation of \codefunctionbold{eq\_check}{mat1,mat2,thld} function for equality check between matrices.}]
+! mat1 dimensions
+N1 = size(mat1, 1)
+M1 = size(mat1, 2)
+
+AreMatEq = .TRUE.
+! check if dimensions of mat1 and mat2 are the same
+! otherwise return false
+if (dim_check(mat1,mat2)) then
+    ! loop over all matrix elements
+    do jj=1,M1
+        do ii=1,N1
+            ! check if equality holds at a certain precision depending on thld
+            ! otherwise exit the loop and return false
+            if (ABS(mat1(ii,jj) - mat2(ii,jj)) &
+                < 0.5*thld_*ABS(mat1(ii,jj) + mat2(ii,jj))) then
+                continue
+            else
+                AreMatEq = .FALSE.
+                exit
+            end if
+        end do
+    end do
+else
+    AreMatEq = .FALSE.
+end if
+\end{lstlisting}
+
+
+
+
+
+\section{Results}
+The new module is tested on the last exercise of week 1. Pre- and post- conditions are now added respectively before and after matrix matrix multiplication. In fact, we want to be sure that, before reaching the matrix multiplication algorithm, the two input matrices have valid (non-negative) dimensions and can be multiplied. Moreover, we want to know if the results obtained for the same input but with different implementations of the algorithm, are the same at a certain precision level.
+
+Note that the debugging functionalities are enable if the option \code{-debug} is given at command line to the executable. Moreover, the source code file is compiled by adding the flags \code{-Wall} and \code{-ffree-line-length-0} in order to print compile warnings and avoid errors for too long lines. Then, the functionalities of the new module are tested by analyzing several cases, such as input matrices with:
+\begin{itemize}
+    \item negative dimensions;
+    \item size such that the multiplication is not possible;
+    \item too large number of entries.
+\end{itemize}
+In each of them, the new checkpoint subroutine works with great flexibility and efficacy. Moreover, the other two functions of the new module confirm that the results of the matrix matrix multiplication algorithms, implemented during week 1, are identical with a threshold value of \( \sim 10^{-14} \) for \( 1000 \times 1000 \) input matrices.
+
+
+
+
+
+\section{Self-evaluation}
+The implementation of the code has led to successful results. A new module is now available for error handling. In particular, a flexible implementation of a checkpoint function can be used for future implementation of algorithms and to write new code in an easier and faster way. Moreover, adding more comments to the code and a concise documentation has made it easier to control and to review. On the other side, a more general way of handling errors through new user-defined types can be implemented for future developments of more complex code.
+
+\end{document}

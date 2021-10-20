@@ -1,0 +1,35 @@
+
+Two utilities are provided:
+- a program "createClass" to create the skeleton of a class
+- a C-shell script "cloneClass" to create a copy of an existing class 
+  with a new name and the same functions
+
+*** Compile ***
+
+c++ -Wall -o createClass createClass.cc
+
+*** Create a new class ***
+
+createClass CLASSNAME [type1 func1 [type2 func2 [...]]]
+
+e.g to create the skeleton of a class with name "Vector2D" and 
+functions "float getX()" and "float getY()" issue the command
+
+createClass Vector2D float getX float getY
+
+Two files Vector2D.h and Vector2D.cc are created; they can be edited 
+to add any parameter to the function(s) or modify anything else
+
+*** Clone a class ***
+
+cloneClass OLDNAME NEWNAME
+
+e.g. to create a Vector3D class as a copy of Vector2D with the same 
+functions issue the command
+
+cloneClass Vector2D Vector3D
+
+Two files Vector3D.h and Vector3D.cc are created; they're identical 
+to Vector2D.h and Vector2D.cc with "Vector2D" replaced by "Vector3D" 
+everywhere.
+

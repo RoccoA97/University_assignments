@@ -1,0 +1,45 @@
+
+The package simulate the ROOT behaviour for the minimal istructions used 
+in the examples with TH1F and TFile objects, for machines where ROOT 
+is not available. 
+Histograms can be saved to a binary file and later dumped to screen and/or 
+converted to ROOT file by tools provided in the package.
+
+*** Install and compile ***
+
+After unpacking the util.tgz file in a directory ..., simply run the script
+.../util/fakeROOT/install
+The full path must be used, issuing the simple command "install"
+after setting the current directory at /util/fakeROOT does not work,
+even if the "." is included in the path list.
+
+*** Usage ***
+
+After installation, the ROOTSYS environment variable can be set to refer 
+to the fakeROOT package issuing the command
+. .../util/fakeROOT/envset.sh
+or
+source .../util/fakeROOT/envset.csh
+for Bourne-shell or C-shell respectively.
+
+This should be not executed when ROOT is available, to avoid conflicts; 
+${ROOTSYS}/bin can be added to the PATH and ${ROOTSYS}/lib must be 
+added to the LD_LIBRARY_PATH .
+
+The code compiling with ROOT should compile the same way, if no other 
+ROOT functionality than the ones described with the examples are used 
+and the fakeROOT/bin/root-config script is used. 
+
+*** Dump and conversion of histograms ***
+
+When histograms have been written to a hist.fake file, they can be dump 
+to the screen issuing the command
+.../util/fakeROOT/bin/dumpHisto hist.fake
+and giving the name of the histogram to dump.
+
+The binary file can be copied to a machine where ROOT is available; 
+after installing the fakeROOT package as described before all the histogram 
+in the hist.fake file can be converted to ROOT format and saved into hist.root 
+file issuing the command
+.../util/fakeROOT/bin/recoverHisto hist.fake hist.root
+

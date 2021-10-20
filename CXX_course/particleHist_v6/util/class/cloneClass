@@ -1,0 +1,13 @@
+#!/bin/sh
+export OLDNAME=$1
+export NEWNAME=$2
+
+export TMPNAME=ABC`date +%s`XYZ
+
+export EXT=h
+sed s/${OLDNAME}/${TMPNAME}/g   ${OLDNAME}.${EXT} |\
+sed s/${TMPNAME}/${NEWNAME}/g > ${NEWNAME}.${EXT}
+export EXT=cc
+sed s/${OLDNAME}/${TMPNAME}/g   ${OLDNAME}.${EXT} |\
+sed s/${TMPNAME}/${NEWNAME}/g > ${NEWNAME}.${EXT}
+

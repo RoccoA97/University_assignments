@@ -1,0 +1,27 @@
+#!/bin/sh
+
+cd `dirname $0`
+export DIR_NAME=`/bin/pwd`
+
+rm -f ${DIR_NAME}/envset.csh
+cat << END_OF_COMMANDS > ${DIR_NAME}/envset.csh
+setenv ROOTSYS ${DIR_NAME}
+END_OF_COMMANDS
+
+rm -f ${DIR_NAME}/envset.sh
+cat << END_OF_COMMANDS > ${DIR_NAME}/envset.sh
+export ROOTSYS=${DIR_NAME}
+END_OF_COMMANDS
+
+rm -f lib/libFakeROOTCore.so
+rm -f lib/libFakeROOTInterface.so
+
+c++ -Wall -fPIC -shared -I Core         -o lib/libFakeCore.so  Core/Fake*.cc
+c++ -Wall -fPIC -shared -I Core -I Fake -o lib/libFakeROOT.so  Fake/T*.cc
+
+rm -f bin/createCommands
+c++ -Wall -o bin/createCommands Core/createCommands.cc
+
+rm -f bin/dumpHisto
+c++ -Wall -I Fake -I Core -o bin/dumpHisto Fake/dumpHisto.cc -L lib -lFakeROOT -lFakeCore
+

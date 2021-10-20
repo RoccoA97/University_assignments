@@ -1,0 +1,2 @@
+rm -f librandom_root.so
+c++ -Wall -fPIC -shared -I ../../../include `root-config --cflags` -o ../../../lib/librandom_root.so RootRandom.cc -L../../../lib -lrandom `root-config --libs`

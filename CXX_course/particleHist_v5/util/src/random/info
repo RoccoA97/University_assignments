@@ -1,0 +1,42 @@
+
+Three classes are provided, to generate random numbers with flat or gaussian 
+distribution:
+- in "base" there's a base    class with a random generator based on stdlib,
+- in "root" there's a derived class with a random generator based on ROOT.
+
+*** Compile ***
+
+cd ..../util/src/random/base
+source compile
+cd ..../util/src/random/root
+source compile
+
+*** Test ***
+
+cd ..../util/src/random/base
+source compileRandom
+source compileRootRandom
+
+testRandom N p X Y
+testRootRandom N p X Y
+where
+N     = number of events to generate
+p X Y = f L H (for flat     distribution, with L and H lower and higher bounds)
+p X Y = g M S (for gaussian distribution, with M and S mean  and sigma)
+
+*** Use ***
+
+Compile including only "..../util/include/Random.h" and link
+"..../util/lib/librandom.so" (always) and
+"..../util/lib/librandom_root.so" (to use the ROOT random generator).
+The ROOT random generator will be automatically used if the librandom_root
+library is linked, otherwise the stdlib random generator will be used.
+
+At the beginning of each session, for csh:
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}":..../util/lib"
+or, for bash
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":..../util/lib"
+
+
+
+

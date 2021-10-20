@@ -1,0 +1,2 @@
+rm -f testRandom
+c++ -Wall -fPIC -I ../../../include -o testRandom testRandom.cc -L../../../lib -Wl,--no-as-needed -lrandom

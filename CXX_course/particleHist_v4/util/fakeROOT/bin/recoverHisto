@@ -1,0 +1,40 @@
+#!/bin/sh
+
+export WORK_DIR=`/bin/pwd`
+cd `dirname $0`
+cd ..
+export FAKE_DIR=`/bin/pwd`
+
+export I_FILE=$1
+export O_FILE=$2
+
+export TEMP_DIR="/tmp/recoverHisto"`/bin/date +%s`
+mkdir ${TEMP_DIR}
+cp ${FAKE_DIR}/Core/recoverHisto.cc ${FAKE_DIR}/Core/FakeTH1F.* ${TEMP_DIR}
+
+export FOUND_C=`which root | grep -v "not found" | wc | awk '{print $1}'`
+export FOUND_D=`printenv | awk -F= '($1=="ROOTSYS"){print $2}' | wc | awk '{print $1}'`
+
+export COMMAND="DUMMY_COMMAND"
+if [ ${FOUND_C} -ne "0" ] ; then
+export COMMAND=root
+elif [ ${FOUND_C} -eq "0" ] && [ ${FOUND_D} -ne "0" ] ; then
+export COMMAND=${ROOTSYS}"/bin/root"
+elif [ ${FOUND_C} -eq "0" ] && [ ${FOUND_D} -eq "0" ] ; then
+echo "root not found"
+fi
+
+export FOUND_C=`which ${COMMAND} | grep -v "not found" | wc | awk '{print $1}'`
+
+if [ ${FOUND_C} -ne "0" ] ; then
+cd ${TEMP_DIR}
+${COMMAND} -l << END_OF_COMMANDS
+.L recoverHisto.cc++
+recoverHisto( "${WORK_DIR}/${I_FILE}", "${WORK_DIR}/${O_FILE}" );
+END_OF_COMMANDS
+rm -f ${TEMP_DIR}/FakeTH1F.*  ${TEMP_DIR}/recoverHisto*
+rmdir ${TEMP_DIR}
+else
+echo "root not found"
+fi
+
